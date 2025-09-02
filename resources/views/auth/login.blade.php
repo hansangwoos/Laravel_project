@@ -1,16 +1,40 @@
-@extends('layouts.layout')
+<!DOCTYPE html>
+<html>
+<head>
+    <title>로그인</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 100px auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        .error { color: red; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h2>로그인</h2>
 
-@section('title', 'login')
+    <form method="POST" action="/login">
+        @csrf
 
+        <div class="form-group">
+            <label for="email">이메일:</label>
+            <input type="email" id="email" name="email" value="{{ old('email') }}" required>
+            @error('email')
+                <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
 
-@section('content')
+        <div class="form-group">
+            <label for="password">비밀번호:</label>
+            <input type="password" id="password" name="password" required>
+            @error('password')
+                <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
 
-    @auth
-        <h1>로그인된 사용자</h1>
-    @endauth
-
-    @guest
-        <h1>로그인이 안된 사용자</h1>
-    @endguest
-
-@endsection
+        <button type="submit">로그인</button>
+        <a href="/register" >회원가입</a>
+    </form>
+</body>
+</html>
