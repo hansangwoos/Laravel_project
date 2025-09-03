@@ -30,7 +30,7 @@ class AuthController extends Controller
 
             // 라라벨 리다이렉터가 제공하는 intended 메소르 사용하여 dashboard 로 이동
             // intended 메소드는 사용자가 인증미들웨어에 의해 잡히기 전 원래 접근을 시도했던 URL로 사용자를 리다이렉트
-            return redirect()->intended();
+            return redirect()->intended('/dashboard');
         };
 
         //
