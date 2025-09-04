@@ -15,8 +15,8 @@ class LunchCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $lunchBreakFirsttime = '12:00';
-        $lunchBreakLasttime = '13:00';
+        $lunchBreakFirsttime = '13:00';
+        $lunchBreakLasttime = '14:00';
 
         $totime = date("H:i");
 
