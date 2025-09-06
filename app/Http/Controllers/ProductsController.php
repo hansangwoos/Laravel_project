@@ -12,13 +12,22 @@ class ProductsController extends Controller
 {
     public function index(){
         // 상품값
-        $products = Product::where('is_active',1)->get();
+        $products = Product::where('is_active',0)->get();
+
+        // 상품 count 값
+        $productCount = Product::where('is_active',0)->count();
 
         // 카트 값
         $carts = Cart::with('product')
                 ->where('user_id', Auth::id())
                 ->get();
 
-        return view('dashboard.index', compact('products','carts'));
+        // 카트 count 값
+        $cartCount = Cart::where('user_id', Auth::id())->sum('quantity');
+
+        // 실행된 쿼리들 확인
+        // dd($cartCount->toArray());
+
+        return view('dashboard.index', compact('products','productCount','carts','cartCount'));
     }
 }
