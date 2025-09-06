@@ -3,6 +3,7 @@
 <head>
     <title>대시보드</title>
     @vite(['resources/css/dashboard.css'])
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
     <!-- 네비게이션 -->
@@ -12,7 +13,6 @@
             <div class="nav-user">
                 <span class="welcome-text">환영합니다, {{ Auth::user()->name }}님! 👋</span>
                 <form method="POST" action="/logout" class="logout-form">
-                    @csrf
                     <button type="submit" class="logout-btn">로그아웃</button>
                 </form>
             </div>
@@ -28,9 +28,8 @@
                 <div class="card-header">
                     <h3>🛒 장바구니</h3>
                 </div>
-                <div class="card-body">
-                    <p class="card-text">현재 장바구니에 <strong id="cart-count">0</strong>개 상품이 있습니다.</p>
-                    <button class="btn btn-primary" onclick="viewCart()">장바구니 보기</button>
+                <div class="card-body" id='cart-section'>
+                    @include('dashboard.partials.cart-section')
                 </div>
             </div>
 
@@ -40,14 +39,7 @@
                     <h3>📦 상품 목록</h3>
                 </div>
                 <div class="card-body">
-                    <div class="product-list">
-                        @foreach($products as $product)
-                            <div class="product-item">
-                                <span class="product-name"> {{$product->name}} </span>
-                                <span class="product-price">₩ {{ number_format($product->price,0)}} </span>
-                                <button class="btn btn-sm btn-success" data-id="{{$product->id}}" data-action="addToCart" data-name="{{$product->name}}" data-price="{{$product->price}}">담기</button>
-                            </div>
-                        @endforeach
+                        @include('dashboard.partials.product-section')
                     </div>
                 </div>
             </div>
