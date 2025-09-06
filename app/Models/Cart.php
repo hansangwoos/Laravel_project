@@ -9,6 +9,7 @@ class Cart extends Model
      protected $fillable = [
         'product_id',
         'user_id',
+        'quantity',
     ];
 
     // 카트 -> 상품
