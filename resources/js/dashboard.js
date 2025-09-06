@@ -43,6 +43,77 @@ function attachEventListeners() {
         setCookie('hideToday', '',-1);
         showPop();
     })
+
+    // 담기 버튼 클릭시 addToCartToDatabase 함수실행
+    document.querySelectorAll('[data-action="addToCart"]').forEach(function(button){
+        button.addEventListener('click',function(){
+            const productId = this.dataset.id;
+            console.log(productId);
+            addToCartToDatabase(productId);
+        })
+    })
+
+    // 장바구니 전체삭제
+    if(document.querySelector('[data-action="clearCart"]')){
+        document.querySelector('[data-action="clearCart"]').addEventListener('click',function(){
+            if (confirm("정말로 삭제하시겠습니까?")) { // confirm 결과 체크
+                clearCart();
+            }
+        })
+    }
+
+    // 장바구니내  - or + 버튼 클릭시
+    if(document.querySelectorAll('.cart-quantity-controls')){
+        document.querySelectorAll('.quantity-btn').forEach(function(button){
+            var dataAction = button.dataset.action;
+            var cartId = button.dataset.id;
+            var quantityCount = button.closest('.cart-item').querySelector('.cart-quantity-display').textContent;
+
+
+            button.addEventListener('click',function(){
+                if(dataAction == 'decreaseQuantity'){
+                    if(quantityCount == 1 ){
+                        if(confirm('1개의 상품은 삭제됩니다. \n정말로 삭제하시겠습니까?')){
+                            removeCartItem(cartId);
+                        }
+                    }else {
+                            updateCartItem(cartId,dataAction);
+                    }
+                }
+            })
+        })
+    }
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// 함수목록
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+// 담기 버튼 클릭시 AJAX 로 /cart/add 라우트 호출 => 호출하여 데이터 담기
+function addToCartToDatabase(productId){
+    fetch('/cart/add', {
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({
+            productId: productId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            // 장바구니 목록 다시 보여주기
+            document.getElementById('cart-section').innerHTML  = data.cartHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Error', error);
+    })
 }
 
 // 팝업 닫기 함수
@@ -62,6 +133,71 @@ function setCookie(name, value, exp){
     document.cookie = name + "=" + value + "; expires=" + date.toUTCString() + "; path=/";
 }
 
+// 장바구니 전체삭제
+function clearCart(){
+    fetch('/cart/clear',{
+        method: 'DELETE',
+        headers:{
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            alert('전체 삭제완료');
+            document.getElementById('cart-section').innerHTML  = data.cartHtml;
+        }
+    })
+}
+
+// 개별 상품 삭제
+function removeCartItem(cartId,quantity){
+
+    fetch('/cart/'+cartId,{
+        method: 'DELETE',
+        headers:{
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({
+            cartId: cartId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            alert('선택하신 상품이 삭제되었습니다');
+            document.getElementById('cart-section').innerHTML  = data.cartHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Error', error);
+    })
+}
 
 
+// - or + 버튼 클릭시 update
+function updateCartItem(cartId,action){
+    fetch('/cart/'+cartId,{
+        method: 'PUT',
+        headers:{
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({
+            cartId: cartId,
+            action: action
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success){
+            document.getElementById('cart-section').innerHTML  = data.cartHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Error', error);
+    })
+}
 
